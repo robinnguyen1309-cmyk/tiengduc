@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Tiếng Đức A1</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; padding: 10px; text-align: center; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .tab-content { display: none; }
+        .active { display: block; }
+        .menu { margin-bottom: 20px; }
+        .menu button { padding: 10px; cursor: pointer; border: none; background: #ddd; border-radius: 5px; margin: 2px; font-size: 14px; }
+        .menu button.active-btn { background: #3498db; color: white; }
+        
+        .list-btn { display: block; width: 100%; padding: 15px; margin: 8px 0; background: #34495e; color: white; border: none; border-radius: 8px; cursor: pointer; text-align: left; font-size: 16px; }
+        .flashcard { padding: 40px; background: #e67e22; color: white; font-size: 24px; border-radius: 10px; cursor: pointer; margin-bottom: 15px; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ccc; box-sizing: border-box; border-radius: 5px; font-size: 16px; }
+        .res { padding: 10px; margin-top: 10px; border-radius: 5px; font-weight: bold; height: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="menu">
+        <button onclick="showTab(0)" id="btn0" class="active-btn">1. Danh sách</button>
+        <button onclick="showTab(1)" id="btn1">2. Flashcard</button>
+        <button onclick="showTab(2)" id="btn2">3. Điền từ</button>
+    </div>
+
+    <div id="tab0" class="tab-content active">
+        <h2>Danh sách</h2>
+        <div id="vocab-list"></div>
+    </div>
+
+    <div id="tab1" class="tab-content">
+        <h2>Flashcard</h2>
+        <div class="flashcard" id="card" onclick="flip()">Hallo</div>
+        <button onclick="nextFlashcard()" style="padding:15px; width:100%; background:#3498db; color:white; border:none; border-radius:5px;">Từ tiếp theo</button>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <h2>Điền tiếng Đức</h2>
+        <p id="vi-text" style="font-weight:bold; font-size:20px;"></p>
+        <input type="text" id="answer" placeholder="Nhập từ..." autocorrect="off" autocapitalize="none">
+        <button onclick="check()" style="padding:15px 30px; background:#27ae60; color:white; border:none; border-radius:5px;">Kiểm tra</button>
+        <div id="res" class="res"></div>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { de: "Hallo", vi: "Xin chào" },
+        { de: "Guten Abend", vi: "Chào buổi tối" },
+        { de: "Guten Morgen", vi: "Chào buổi sáng" },
+        { de: "Entschuldigung", vi: "Xin lỗi" },
+        { de: "Ich heiße...", vi: "Tôi tên là..." },
+        { de: "Danke", vi: "Cảm ơn" },
+        { de: "Tschüss", vi: "Tạm biệt" },
+        { de: "Freut mich", vi: "Rất vui được gặp bạn" },
+        { de: "Viel Glück", vi: "Chúc may mắn" }
+    ];
+
+    // Hàm gọi giọng đọc của điện thoại
+    function speak(text) {
+        window.speechSynthesis.cancel(); // Hủy giọng đọc cũ nếu đang chạy
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'de-DE';
+        msg.rate = 0.9; // Tốc độ vừa phải cho người học
+        window.speechSynthesis.speak(msg);
+    }
+
+    function showTab(n) {
+        document.querySelectorAll('.tab-content').forEach((t, i) => t.style.display = (i === n) ? 'block' : 'none');
+        document.querySelectorAll('.menu button').forEach((b, i) => b.className = (i === n) ? 'active-btn' : '');
+    }
+
+    const list = document.getElementById('vocab-list');
+    data.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'list-btn';
+        btn.innerHTML = `<strong>${item.de}</strong><br>${item.vi}`;
+        btn.onclick = () => speak(item.de);
+        list.appendChild(btn);
+    });
+
+    let fIdx = 0;
+    let isDe = true;
+    function flip() {
+        isDe = !isDe;
+        document.getElementById('card').innerText = isDe ? data[fIdx].de : data[fIdx].vi;
+        if(isDe) speak(data[fIdx].de);
+    }
+    function nextFlashcard() { 
+        fIdx = (fIdx + 1) % data.length; 
+        document.getElementById('card').innerText = data[fIdx].de; 
+        isDe = true;
+        speak(data[fIdx].de);
+    }
+
+    let qIdx = 0;
+    document.getElementById('vi-text').innerText = data[qIdx].vi;
+    function check() {
+        const val = document.getElementById('answer').value.trim();
+        const res = document.getElementById('res');
+        if (val.toLowerCase() === data[qIdx].de.toLowerCase()) {
+            res.innerText = "Chính xác! " + data[qIdx].de;
+            res.style.color = "green";
+            speak(data[qIdx].de);
+            setTimeout(() => {
+                qIdx = (qIdx + 1) % data.length;
+                document.getElementById('vi-text').innerText = data[qIdx].vi;
+                document.getElementById('answer').value = "";
+                res.innerText = "";
+            }, 1500);
+        } else {
+            res.innerText = "Sai rồi!";
+            res.style.color = "red";
+        }
+    }
+</script>
+</body>
+</html>
