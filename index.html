@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Học Tiếng Đức A1</title>
     <style>
-        body { font-family: sans-serif; background-color: #f4f7f6; padding: 10px; text-align: center; }
+        body { font-family: sans-serif; background-color: #f4f7f6; padding: 10px; text-align: center; margin: 0; }
         .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .active { display: block; }
-        .menu { margin-bottom: 20px; }
+        .menu { margin-bottom: 20px; display: flex; justify-content: center; }
         .menu button { padding: 10px; cursor: pointer; border: none; background: #ddd; border-radius: 5px; margin: 2px; font-size: 14px; }
         .menu button.active-btn { background: #3498db; color: white; }
         
@@ -29,7 +29,7 @@
     </div>
 
     <div id="tab0" class="tab-content active">
-        <h2>Danh sách</h2>
+        <h2>Danh sách từ vựng</h2>
         <div id="vocab-list"></div>
     </div>
 
@@ -61,12 +61,11 @@
         { de: "Viel Glück", vi: "Chúc may mắn" }
     ];
 
-    // Hàm gọi giọng đọc của điện thoại
     function speak(text) {
-        window.speechSynthesis.cancel(); // Hủy giọng đọc cũ nếu đang chạy
+        window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'de-DE';
-        msg.rate = 0.9; // Tốc độ vừa phải cho người học
+        msg.rate = 0.9;
         window.speechSynthesis.speak(msg);
     }
 
